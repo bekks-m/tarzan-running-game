@@ -68,28 +68,25 @@ A 2.5D side-scrolling platformer cloning the mechanics of the 1999 Disney's Tarz
 
 ## 3. Reference library — build this before tuning
 
-The plan previously rested on "make it feel right" with no definition of right. No published frame data exists for the original, so measure it yourself. Budget 45 minutes, once.
+The plan previously rested on "make it feel right" with no definition of right. No published frame data exists for the original, so measure it yourself.
 
-### Protocol
+**Status: partially measured.** See `reference/original-metrics.md` for results and confidence levels.
 
-1. Find a longplay of the PS1 or PC version. Note that the console version runs at a lower framerate than the PC release, so record which you measured.
-2. Step frame by frame (`,` and `.` in a paused YouTube player).
-3. **Measure everything in character-heights and character-widths, never pixels.** This makes the values resolution-independent and directly portable into `tuning.json`, which is authored in tiles.
+### Protocol — revised, and it is not frame counting
 
-### Values to capture → `reference/original-metrics.md`
+Revision 3 said "step frame by frame, count frames ÷ fps." **That method is invalid on the capture we have.** `reference-video.mov` is a variable-frame-rate screen recording (nominal 34.835 fps), so frames are not evenly spaced in time: twelve frames might span 340 ms or 290 ms, and nothing on screen tells you which. Counting would have produced confident, wrong numbers.
 
-| Metric | Unit | Yours |
-|---|---|---|
-| Frames from jump input to apex | frames @ fps | |
-| Total airtime, standing jump | frames | |
-| Jump height | character-heights | |
-| Jump height, tapped vs held | character-heights | |
-| Max gap cleared, running jump | character-widths | |
-| Run speed | character-widths / second | |
-| Acceleration to full run | frames | |
-| Swing arc, grab to release | frames | |
-| Horizontal distance gained per swing | character-widths | |
-| Fall speed vs rise speed | ratio, eyeballed from frame counts | |
+Use exact-timestamp extraction instead:
+
+1. Pull frames at precise times via AVFoundation with zero snapping tolerance (`AVAssetImageGenerator`, `requestedTimeTolerance{Before,After} = .zero`). Verified accurate to within ~20 ms of request.
+2. Read timings directly in **milliseconds** — which is what `tuning.json` wants anyway, so the frame-count conversion and its error disappear entirely.
+3. Measure spatial values in **character-heights**, taking the character-height denominator from a *grounded frame in the same scene*.
+
+### Three traps specific to this source
+
+- **3D perspective.** On-screen character size changes with depth, so a height measured in one scene does not transfer to another. This is the weakest link in every spatial number.
+- **Scrolling camera.** Screen-space Y mixes character motion with camera motion. Only measure where the camera is vertically stable, or measure against a ground line visible in the same frame.
+- **Sloped terrain.** A jump that lands lower than it took off has asymmetric airtime for reasons unrelated to gravity. `fallGravityMultiplier` needs a *flat-ground* jump; anything else is an artifact.
 
 ### One design target worth naming
 
