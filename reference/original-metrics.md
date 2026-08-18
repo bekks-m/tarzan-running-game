@@ -24,71 +24,88 @@ skin-tone blob tracking in a camera-relative window. Measured 2026-08-17.
 
 ## Measured
 
-| Metric | Value | Confidence | Feeds |
-|---|---|---|---|
-| **Time to apex** | **~200 ms** | **SOLID** | `jump.timeToApexMs` |
-| Jump rise (screen) | ~78 px | SOLID | — |
-| Character height (same scene) | ~85–95 px | SOFT | denominator |
-| **Jump height** | **~0.85 character-heights** | **SOFT** | `jump.heightTiles` |
-| Fall : rise ratio | — | **NOT MEASURABLE** | `jump.fallGravityMultiplier` |
-| Run speed | not yet measured | — | `run.maxSpeedTilesPerSec` |
-| Accel to full run | not yet measured | — | `run.timeToMaxSpeedMs` |
-| Swing arc | not yet measured | — | `swing.*` |
-| Distance per swing | not yet measured | — | level grammar |
+Source: **`jumps.mov`** — 8.1 s, three deliberate jumps on a **flat log with a static
+world**. This is the good sample; the earlier `reference-video.mov` numbers are
+superseded (see correction below).
 
-### The sample
+Method: exact-timestamp extraction, skin-tone blob tracking, **and per-frame camera
+compensation** — the camera pans vertically up to 254 px during a jump, so raw screen-Y
+is meaningless. World-Y is recovered by cross-correlating static background rows against
+a reference frame and subtracting the camera offset.
 
-Jump at **t = 320.0 s**. Ground at 319.92–320.00 (feet y≈428), apex at
-320.205–320.233 (feet y=350), descending through 320.9.
+| Jump | Rise | Fall | Airtime | Peak height | fall/rise |
+|---|---|---|---|---|---|
+| **Small** (tapped) | **128 ms** | 128 ms | 256 ms | **1.18 char-heights** | 1.00 |
+| **Medium** | **333 ms** | 384 ms | 717 ms | **3.31 char-heights** | 1.15 |
+| **Large** (held) | **333 ms** | 589 ms | 922 ms | **3.91 char-heights** | 1.77 |
 
-### Why fall:rise is marked NOT MEASURABLE
-
-He takes off from a hillside and lands on **lower ground**, so the descent
-continues past takeoff height and the airtime is asymmetric for reasons that have
-nothing to do with gravity. Raw numbers give rise 71 px/201 ms vs fall 114 px/689 ms
-— implying fall is *slower* than rise, i.e. `fallGravityMultiplier < 1`, which is
-almost certainly an artifact of the slope plus possible vertical camera pan rather
-than a real property of the game.
-
-**Measure this from a flat-ground jump before trusting any number for it.**
+Character height 74 px (63 px skin-masked + ~18% for the dark hair the mask excludes),
+median over 198 grounded frames. Ground plane flat at world-Y 500.
 
 ---
 
-## What this already tells you — and it contradicts the plan's defaults
+## CORRECTION — the earlier 200 ms figure was wrong
 
-| Value | Plan's guess | Measured | Direction |
+An earlier pass on `reference-video.mov` reported **time to apex ~200 ms** and concluded
+the plan's 350 ms guess was far too slow. **Discard that.** That sample was taken on
+sloped terrain with an uncompensated panning camera — both errors push the apex earlier.
+
+The flat-ground, camera-corrected measurement is **333 ms**, which means the plan's
+original guess of 350 ms was very nearly right. The reference-video jump-height figure
+(~0.85 char-heights) is superseded for the same reason.
+
+Lesson worth keeping: on this source, *any* measurement without camera compensation is
+untrustworthy, and it fails in a direction that looks plausible rather than obviously broken.
+
+---
+
+## What this changes in tuning.json
+
+| Value | Plan's guess | Measured | Verdict |
 |---|---|---|---|
-| `jump.timeToApexMs` | 350 | **~200** | Much snappier |
-| `jump.heightTiles` | 3.0 | **~1.7** (at 2 tiles/character) | Much lower |
+| `jump.timeToApexMs` | 350 | **333** | Guess was good — keep ~335 |
+| `jump.heightTiles` | 3.0 | **~7.8** (at 2 tiles/character) | **Guess was far too low** |
+| `jump.releaseCutMultiplier` | 0.4 | **~0.55** | Slightly too aggressive |
+| `jump.fallGravityMultiplier` | 2.0 | **~1.0, see caveat** | **Guess likely too high** |
 
-Both point the same way: **the original's jump is quicker and smaller than the plan
-assumed.** That is a coherent finding, not two unrelated errors — a short, fast hop
-rather than a big floaty arc, which fits the "momentum-forward and forgiving"
-design target.
+Height ratio tapped:held = 1.18 : 3.91 = **0.30**. Height scales with v², so the velocity
+cut is sqrt(0.30) ≈ **0.55**.
 
-**Suggested starting point for the tuning block** (replacing the plan's guesses):
+### Caveat on fallGravityMultiplier — still not fully settled
+
+The small jump is textbook symmetric: rise 128 ms, fall 128 ms, ratio 1.00, implying
+**fall gravity == rise gravity**. But medium and large show fall *longer* than rise
+(1.15, 1.77), implying fall is *slower*.
+
+Constant gravity cannot produce both. Either the bigger jumps land below takeoff height,
+or the landing-recovery animation extends the detected airborne segment, or the game
+genuinely floats the descent on longer jumps.
+
+**Do not set `fallGravityMultiplier` to 2.0 on the plan's say-so.** Start at **1.0** —
+which the cleanest sample directly supports — and raise it by feel only if the fall reads
+as floaty. This is the value the plan calls "most of the difference between floaty and
+good," so it deserves the tuning block's attention rather than an inherited guess.
+
+### Suggested starting point
 
 ```json
-"jump": { "heightTiles": 1.8, "timeToApexMs": 210 }
+"jump": {
+  "heightTiles": 7.5,
+  "timeToApexMs": 335,
+  "releaseCutMultiplier": 0.55,
+  "fallGravityMultiplier": 1.0
+}
 ```
 
-Start there rather than at 3.0 / 350. Then tune by feel — these are targets, not
-answers.
+Two of those four move a long way from the plan's defaults. Start here, then tune by feel.
 
----
+## Still unmeasured
 
-## Caveats worth holding onto
-
-1. **One jump sample**, and possibly not a maximal one. A second flat-ground jump
-   would confirm or move it.
-2. **3D perspective.** Character on-screen size varies with depth, so the
-   character-height denominator is the weakest link in every spatial number.
-   Always take it from a grounded frame in the *same* scene.
-3. **Scrolling camera.** Screen-space Y mixes character motion with camera motion.
-   Only measure where the camera is vertically stable, or measure relative to a
-   ground line visible in the same frame.
-4. `t=70 s` is a **tree-surf section**, not a standing jump — not usable.
-5. `t=769 s` does not show a vine swing at that instant.
+| Metric | Best source |
+|---|---|
+| Run speed, acceleration | `reference-video.mov` t=81 s |
+| Swing arc, distance per swing | `reference-video.mov` t=210 s (monkey-bar traverse) |
+| Max gap cleared running | needs a flat-ground gap sequence |
 
 ## Best remaining sources in the capture
 
