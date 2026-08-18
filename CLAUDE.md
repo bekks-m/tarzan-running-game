@@ -5,6 +5,9 @@
 Phaser 4 + TypeScript + Vite. Read `PROJECT-PLAN.md` and `specs.md` before large changes.
 
 When any vendored skill disagrees with `node_modules/phaser/types`, the types win.
+Before using anything in `.claude/skills/phaser4/`, read that directory's `README.md` —
+it is API reference from the Phaser 4 pre-release period, and it demonstrates several
+patterns this project forbids.
 
 ## Load-bearing architecture — never bypass
 
