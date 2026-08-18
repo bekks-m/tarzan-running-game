@@ -37,3 +37,8 @@ reference/tzagdemo.zip
 reference/**/*.exe
 reference/**/*.fsd
 reference/**/*.ecm
+reference/**/*.mov
+reference/**/*.mp4
+reference/**/*.mkv
+reference/**/*.avi
+reference/**/*.webm
