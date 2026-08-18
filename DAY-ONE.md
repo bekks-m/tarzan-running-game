@@ -414,7 +414,7 @@ Play it three times. Anything that killed you unfairly is usually a gap at 100% 
 
 ## 08:00–08:45 — Content systems
 
-> Add: collectible coins with a pickup tween; three hidden letters off the main path, **distinguished by shape as well as colour**; one patrolling enemy defeated by a thrown projectile; a visibly-activating mid-level checkpoint; death and respawn to last checkpoint; a level-complete state showing coins and letters.
+> Add: collectible coins with a pickup tween; the six T-A-R-Z-A-N letters off the main path (the original shipped 6 per level), **distinguished by shape as well as colour**; one patrolling enemy defeated by a thrown projectile; a visibly-activating mid-level checkpoint; death and respawn to last checkpoint; a level-complete state showing coins and letters.
 
 **Verify:** die deliberately after the checkpoint; confirm you return to it.
 

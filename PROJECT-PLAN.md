@@ -2,6 +2,8 @@
 
 A 2.5D side-scrolling platformer cloning the mechanics of the 1999 Disney's Tarzan action game, skinned entirely with original design. **Web-first, desktop and mobile, portfolio-targeted.**
 
+> Revision 4 — level 2 pinned to tree surfing after manual research (`reference/manual-notes.md`); collectible counts aligned to the source. Day one deliberately unchanged.
+>
 > Revision 3 — second critical pass. Changes: physics core made engine-agnostic and headless-testable, UI moved to DOM as a load-bearing decision, all tuning values converted to tile-relative units, swing damping unit contradiction resolved, determinism test corrected (it was testing the wrong thing), input sampling contract added, Playwright reconciled with CLAUDE.md, permission deny-list widened, remote phone session added as a first-class working mode.
 >
 > Revision 2 — revised against a critical review. Changes: App Store cut, scope reduced to three levels, testing strategy added, day one is now production code rather than a prototype, reference library added, accessibility added, case study capture added.
@@ -14,7 +16,7 @@ A 2.5D side-scrolling platformer cloning the mechanics of the 1999 Disney's Tarz
 |---|---|
 | Purpose | Portfolio piece — publicly linkable |
 | **Distribution** | **Web only. A URL a reviewer opens in one click.** |
-| Scope | **3 levels: one platforming, one chase, one boss** |
+| Scope | **3 levels: one platforming, one tree-surf runner, one boss** |
 | Failure model | Lives → checkpoint. Game over → start of level |
 | Difficulty | Multiple tiers, hint character on lower tiers |
 | Progression | Linear |
@@ -31,7 +33,11 @@ A 2.5D side-scrolling platformer cloning the mechanics of the 1999 Disney's Tarz
 | **Working mode** | **Laptop session, driven from the phone via Remote Control. See REMOTE-SESSION.md.** |
 | Code review | Mostly trusting agent output → **tests are the safety net, not review** |
 
-**Why three levels, one of each type:** three *different* mechanics demonstrate more range than three platforming levels, and reviewers rarely play past level two anyway. The chase is now a third of the content rather than a bonus — scope it as a real system, not a set piece.
+**Why three levels, one of each type:** three *different* mechanics demonstrate more range than three platforming levels, and reviewers rarely play past level two anyway. The runner is now a third of the content rather than a bonus — scope it as a real system, not a set piece.
+
+**Level 2 is tree surfing specifically, not a generic chase.** *(Revision 4.)* The original already shipped a three-lane runner — land on a twisting branch, auto-forward motion, duck under overhangs, jump low vines, swing wide laterally, collect throughout, with the parasol as an offensive verb against baboons ahead. That is a complete runner grammar, in the source, already balanced by people who shipped it. Building "a chase level" from scratch invents a design problem that the reference already solved. See `reference/manual-notes.md`.
+
+**Why the runner is level 2 and not level 1**, despite the repo name: day one's job is proving the six load-bearing decisions, and it should carry the least novel risk possible. Platforming exercises the fixed timestep, the pure integrator, the collision interface and the tuning harness against a mechanic whose feel targets are already measured. The runner needs a second control scheme and its own obstacle-spacing grammar — real work, but work that benefits from an architecture already proven rather than one being invented alongside it.
 
 **Why not the App Store:** it adds an annual fee, review risk on wrapped web content, Capacitor complexity, age ratings and the entire COPPA compliance surface — in exchange for nothing a portfolio reviewer wants. A link is strictly better. Revisit only if the game outgrows being a portfolio piece.
 
@@ -269,7 +275,7 @@ The tuning overlay screenshot and the reference-vs-final comparison are the two 
 | 1 | **Day one** — architecture, movement, swing, Level 1, saves, deployed |
 | 2 | Tuning session 2 against reference targets |
 | 3 | Art direction: Spine character, Blender environments, audio |
-| 4 | Chase level — second control scheme, camera and collision model |
+| 4 | **Tree-surf runner** — auto-forward, three-lane duck/jump/dodge, parasol verb |
 | 5 | Boss fight |
 | 6 | Difficulty tiers + hint character |
 | 7 | Accessibility polish, full menu |
@@ -302,7 +308,7 @@ If you split it, split at the 05:00 break and at 08:00 — both are green-build 
 | Agent breaks working systems | Three unit tests from day one + Playwright smoke + constant commits |
 | Day-one shortcuts calcify | Six load-bearing decisions made properly on day one |
 | **Frame-coupling ships silently** | Determinism test asserts exact equality — possible only because the integrator is Phaser-free |
-| Chase level is underestimated | Now a third of content, scoped as its own phase with its own systems |
+| Runner level is underestimated | Now a third of content, its own phase, and its grammar is taken from the source rather than invented |
 | Art becomes the bottleneck | Spine caps animation cost; interface makes the swap cheap |
 | Save loss on iOS Safari | PWA install exemption + export/import + localStorage mirror |
 | **Phone testing loop is slow enough that you skip it** | Remote Control session — see REMOTE-SESSION.md |
