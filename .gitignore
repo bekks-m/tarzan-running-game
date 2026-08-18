@@ -26,3 +26,14 @@ npm-debug.log*
 
 # Pre-repo revision 2 doc copies, kept for reference only
 .archive/
+
+# Reference material from the original game — STUDY ONLY, NEVER COMMITTED.
+# IP posture: mechanics are cloned, every shipped asset is original.
+# A Disney binary in a public portfolio repo is a licensing problem and
+# 30MB of permanent history. Measurements go in original-metrics.md; the
+# source material stays local.
+reference/tzagdemo/
+reference/tzagdemo.zip
+reference/**/*.exe
+reference/**/*.fsd
+reference/**/*.ecm
