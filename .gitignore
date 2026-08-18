@@ -42,3 +42,8 @@ reference/**/*.mp4
 reference/**/*.mkv
 reference/**/*.avi
 reference/**/*.webm
+reference/**/*.n64
+reference/**/*.z64
+reference/**/*.v64
+reference/**/*.bin
+reference/**/*.pdf
