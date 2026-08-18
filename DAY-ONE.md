@@ -242,11 +242,9 @@ Case-study rule: every time you commit a milestone, drop a screenshot and two se
 
 ---
 
-## 00:00–00:20 — Kickoff
+## 00:00–00:10 — Kickoff (shortened)
 
-Start asset generation first so it renders while you code. One locked reference image is your best defense against frame-to-frame inconsistency.
-
-> Generate a character reference sheet for a 2D platformer protagonist: [description]. Side view, neutral standing pose, high-resolution, transparent background, flat stylized shading, no outline. Then a matching jungle tileset: ground, platform edges, hanging vines, and three parallax canopy layers at decreasing detail and increasing haze.
+**Asset generation is no longer needed here.** Placeholder art is already staged and committed in `assets/` — Kenney New Platformer Pack, CC0, with the `AnimationController` state mapping documented in `assets/README.md`. That frees ~10 minutes and removes the day's only external dependency.
 
 Verify setup: `claude --version`, `ls .claude/skills/phaser4/`, `cat .claude/settings.json`, and `/plugin` showing official-only.
 
@@ -267,7 +265,7 @@ Plan mode on:
 > Scaffold Phaser 4 + TypeScript + Vite with these six load-bearing pieces in place from the start:
 > 1. A movement integrator as a pure function `step(state, input, tuning, dt)` with **no Phaser import**, and a `CollisionWorld` interface with a Phaser tilemap implementation plus a plain-fixture implementation for tests
 > 2. A fixed timestep loop that this project owns and that drives Phaser, not the reverse. Clamp to maxSubSteps and discard the remainder; reset the accumulator on visibilitychange
-> 3. tuning.json in design-intent units with unit suffixes on every key, constants derived at load, plus tuning.meta.json with min/max/step
+> 3. **`tuning.json`, `tuning.defaults.json` and `tuning.meta.json` ALREADY EXIST at the repo root and are committed. Load them; do not create, regenerate or overwrite them.** They hold values measured from reference footage. Wire up derivation-at-load and the unit-suffix contract against the existing files.
 > 4. A single InputState object, latched once per render frame and consumed per physics step, with edge events consumed exactly once
 > 5. A SaveStore interface **and today's implementation** — IndexedDB with a synchronous localStorage mirror, promoted only after a verified read-back
 > 6. A DOM UI layer over the canvas, with pointer events routed so the overlay doesn't eat gameplay taps
