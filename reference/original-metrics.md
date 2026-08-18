@@ -1,79 +1,113 @@
 # Reference metrics — measured from the original
 
-**Status: NOT YET MEASURED. This file is the gate on the 03:00–05:00 tuning block.**
+**Source:** `reference-video.mov` — 990.1 s of PC-version gameplay capture, 1504×994.
+**Method:** AVFoundation exact-timestamp frame extraction (zero snapping tolerance),
+skin-tone blob tracking in a camera-relative window. Measured 2026-08-17.
 
-Budget 45 minutes, once. Do it before day one, not during.
-
-Without these numbers, the two-hour tuning block silently becomes "adjust until it feels
-okay" — which is the failure the whole plan exists to prevent, and it will not announce
-itself. You will finish the block feeling fine about it.
+> **Protocol changed from the plan.** The capture is **variable frame rate**
+> (nominal 34.835 fps). The plan's "count frames ÷ fps" method silently produces
+> wrong numbers on VFR footage — 12 frames might be 340 ms or 290 ms, and nothing
+> tells you which. All timings below are read from **exact timestamps in
+> milliseconds** instead, which is also what `tuning.json` wants directly.
 
 ---
 
-## Protocol
-
-1. Find a longplay of the **PS1 or PC** version. Record which — the console version runs
-   at a lower framerate than the PC release, and every frame count below depends on it.
-2. Step frame by frame: `,` and `.` in a paused YouTube player.
-3. **Measure in character-heights and character-widths, never pixels.** `tuning.json` is
-   authored in tiles, so these port directly. A character is roughly 2 tiles tall — pin
-   that ratio once, early, and use it consistently.
-
-## Source
+## Confidence legend
 
 | | |
 |---|---|
-| Version measured | <!-- PS1 / PC --> |
-| Video URL | |
-| Playback framerate | <!-- fps --> |
-| Assumed character height | <!-- in tiles, e.g. 2.0 --> |
-| Date measured | |
+| **SOLID** | Read from exact timestamps. Trust it. |
+| **SOFT** | Spatial measurement. Depends on the character-height denominator, which 3D perspective makes uncertain by roughly ±15%. |
+| **NOT MEASURABLE** | Sample was corrupted by sloped terrain or camera motion. Do not guess from it. |
 
 ---
 
-## Measurements
+## Measured
 
-| Metric | Unit | Value | → maps to |
+| Metric | Value | Confidence | Feeds |
 |---|---|---|---|
-| Jump input → apex | frames @ fps | | `jump.timeToApexMs` |
-| Total airtime, standing jump | frames | | sanity-check on apex + fall |
-| Jump height | character-heights | | `jump.heightTiles` |
-| Tapped vs held jump height | character-heights | | `jump.releaseCutMultiplier` |
-| Max gap cleared, running | character-widths | | exit condition (±10%) |
-| Run speed | char-widths / sec | | `run.maxSpeedTilesPerSec` |
-| Acceleration to full run | frames | | `run.timeToMaxSpeedMs` |
-| Swing arc, grab → release | frames | | `swing` tuning |
-| Distance gained per swing | character-widths | | swing-gap unit for level grammar |
-| Fall : rise speed | ratio | | `jump.fallGravityMultiplier` |
+| **Time to apex** | **~200 ms** | **SOLID** | `jump.timeToApexMs` |
+| Jump rise (screen) | ~78 px | SOLID | — |
+| Character height (same scene) | ~85–95 px | SOFT | denominator |
+| **Jump height** | **~0.85 character-heights** | **SOFT** | `jump.heightTiles` |
+| Fall : rise ratio | — | **NOT MEASURABLE** | `jump.fallGravityMultiplier` |
+| Run speed | not yet measured | — | `run.maxSpeedTilesPerSec` |
+| Accel to full run | not yet measured | — | `run.timeToMaxSpeedMs` |
+| Swing arc | not yet measured | — | `swing.*` |
+| Distance per swing | not yet measured | — | level grammar |
+
+### The sample
+
+Jump at **t = 320.0 s**. Ground at 319.92–320.00 (feet y≈428), apex at
+320.205–320.233 (feet y=350), descending through 320.9.
+
+### Why fall:rise is marked NOT MEASURABLE
+
+He takes off from a hillside and lands on **lower ground**, so the descent
+continues past takeoff height and the airtime is asymmetric for reasons that have
+nothing to do with gravity. Raw numbers give rise 71 px/201 ms vs fall 114 px/689 ms
+— implying fall is *slower* than rise, i.e. `fallGravityMultiplier < 1`, which is
+almost certainly an artifact of the slope plus possible vertical camera pan rather
+than a real property of the game.
+
+**Measure this from a flat-ground jump before trusting any number for it.**
 
 ---
 
-## Conversion notes
+## What this already tells you — and it contradicts the plan's defaults
 
-- `frames ÷ fps × 1000` → ms for any `*Ms` key
-- `character-heights × (character height in tiles)` → tiles for any `*Tiles` key
-- Fall:rise ratio maps directly onto `fallGravityMultiplier` — the plan's starting guess
-  is `2.0`, so a measured ratio far from that is the single most valuable number here
+| Value | Plan's guess | Measured | Direction |
+|---|---|---|---|
+| `jump.timeToApexMs` | 350 | **~200** | Much snappier |
+| `jump.heightTiles` | 3.0 | **~1.7** (at 2 tiles/character) | Much lower |
 
-## The design target to hold onto
+Both point the same way: **the original's jump is quicker and smaller than the plan
+assumed.** That is a coherent finding, not two unrelated errors — a short, fast hop
+rather than a big floaty arc, which fits the "momentum-forward and forgiving"
+design target.
 
-A runner abandoned a tool-assisted speedrun of the original because most of it is "hold
-right" — there wasn't enough room for stunts. **The game is momentum-forward and
-forgiving, not precision-demanding.** If your level starts requiring pixel-perfect input,
-you've drifted from the reference, regardless of what these numbers say.
+**Suggested starting point for the tuning block** (replacing the plan's guesses):
+
+```json
+"jump": { "heightTiles": 1.8, "timeToApexMs": 210 }
+```
+
+Start there rather than at 3.0 / 350. Then tune by feel — these are targets, not
+answers.
 
 ---
 
-## After tuning — fill this in too
+## Caveats worth holding onto
 
-This side-by-side is one of the two most compelling case-study artifacts. Capture it while
-the numbers are fresh.
+1. **One jump sample**, and possibly not a maximal one. A second flat-ground jump
+   would confirm or move it.
+2. **3D perspective.** Character on-screen size varies with depth, so the
+   character-height denominator is the weakest link in every spatial number.
+   Always take it from a grounded frame in the *same* scene.
+3. **Scrolling camera.** Screen-space Y mixes character motion with camera motion.
+   Only measure where the camera is vertically stable, or measure relative to a
+   ground line visible in the same frame.
+4. `t=70 s` is a **tree-surf section**, not a standing jump — not usable.
+5. `t=769 s` does not show a vine swing at that instant.
+
+## Best remaining sources in the capture
+
+| Moment | t | Why it's good |
+|---|---|---|
+| Monkey-bar vine traverse | **210 s** | Cleanest in the whole capture — high contrast, dark background |
+| Run on flat ledge | **81 s** | Camera fairly stable, good for run speed and acceleration |
+| Running jump over gap | **66 s** | Log crossing; needs a flat-ground segment isolated |
+| Cliff hang / climb | 454 s | Clean, but climb is out of scope for v1 |
+
+---
+
+## After tuning — fill this in
 
 | Metric | Reference | My final value | Δ | Why it differs |
 |---|---|---|---|---|
-| Jump height | | | | |
-| Time to apex | | | | |
-| Fall multiplier | | | | |
+| Jump height | ~0.85 char-h | | | |
+| Time to apex | ~200 ms | | | |
+| Fall multiplier | unmeasured | | | |
 | Run speed | | | | |
 | Max gap cleared | | | | |
 | Distance per swing | | | | |
