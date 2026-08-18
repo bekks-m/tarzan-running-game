@@ -47,3 +47,9 @@ reference/**/*.z64
 reference/**/*.v64
 reference/**/*.bin
 reference/**/*.pdf
+
+# Raw asset-pack downloads — staging area, disposable, not committed.
+# 99MB of vendor kits that get thrown away at Phase 3. Anything the BUILD
+# actually loads must live in assets/ and BE committed, or the Vercel deploy
+# has no art.
+art-placeholder/
