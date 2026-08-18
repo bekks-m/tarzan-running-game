@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 2,
+  "world": {
+    "tileSize": 32,
+    "fixedTimestepHz": 60,
+    "maxSubSteps": 5,
+    "characterHeightTiles": 2.0
+  },
+  "run": {
+    "maxSpeedTilesPerSec": 8.0,
+    "timeToMaxSpeedMs": 140,
+    "timeToStopMs": 90,
+    "turnaroundMultiplier": 2.0,
+    "airAccelMultiplier": 0.7,
+    "airDragMultiplier": 0.4
+  },
+  "jump": {
+    "heightTiles": 7.8,
+    "timeToApexMs": 335,
+    "fallGravityMultiplier": 1.0,
+    "releaseCutMultiplier": 0.55,
+    "coyoteMs": 120,
+    "bufferMs": 140,
+    "apexVelocityThresholdTilesPerSec": 2.0,
+    "apexGravityMultiplier": 0.5,
+    "apexAirControlMultiplier": 1.3,
+    "cornerCorrectionTiles": 0.2,
+    "maxFallSpeedTilesPerSec": 32.0
+  },
+  "swing": {
+    "defaultRopeLengthTiles": 5.0,
+    "gravityScale": 1.0,
+    "dampingPerSecond": 0.74,
+    "pumpAngularAccel": 3.2,
+    "maxAngularVelocity": 4.0,
+    "grabRadiusTiles": 1.5,
+    "grabRadiusTouchMultiplier": 1.5,
+    "grabConeDegrees": 60,
+    "grabMomentumTransfer": 0.85,
+    "grabCooldownMs": 150,
+    "releaseBoostMultiplier": 1.2,
+    "releaseUpwardBiasTilesPerSec": 3.75,
+    "autoSnapToNearest": true
+  },
+  "combat": {
+    "fruitSpeedTilesPerSec": 16.0,
+    "fruitArcGravityScale": 0.6,
+    "throwCooldownMs": 300,
+    "hitstopMs": 60
+  },
+  "camera": {
+    "lookaheadTiles": 3.0,
+    "lookaheadSmoothMs": 240,
+    "followSmoothMs": 140,
+    "deadzoneWidthTiles": 2.0,
+    "deadzoneHeightTiles": 4.0
+  }
+}

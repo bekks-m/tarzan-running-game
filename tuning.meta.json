@@ -1,0 +1,81 @@
+{
+  "jump.heightTiles": {
+    "label": "Jump height", "unit": "tiles",
+    "min": 1.0, "max": 12.0, "step": 0.1, "applyMode": "live",
+    "note": "MEASURED 3.91 character-heights from jumps.mov (large/held jump), x2.0 tiles per character. Confidence: soft, +/-15% from the character-height denominator. 2.6x the original plan guess of 3.0."
+  },
+  "jump.timeToApexMs": {
+    "label": "Time to apex", "unit": "ms",
+    "min": 100, "max": 900, "step": 5, "applyMode": "live",
+    "note": "MEASURED 333ms, flat ground, camera-compensated. Confidence: solid. Identical for medium and held jumps, so this is the engine's rise time."
+  },
+  "jump.fallGravityMultiplier": {
+    "label": "Fall gravity", "unit": "x rise",
+    "min": 0.5, "max": 4.0, "step": 0.05, "applyMode": "live",
+    "note": "MEASURED 1.00 from the small jump (rise 128ms = fall 128ms, perfectly symmetric). UNUSUAL - most 2D platformers use 1.5-2.5 because it feels better. This is a 1999 3D game; treat 1.0 as the reference's answer, not necessarily the right one. Most likely value to change by feel."
+  },
+  "jump.releaseCutMultiplier": {
+    "label": "Tap-jump cut", "unit": "x velocity",
+    "min": 0.1, "max": 1.0, "step": 0.05, "applyMode": "live",
+    "note": "DERIVED from measured tap:hold height ratio 1.18:3.91 = 0.30. Height scales with v^2, so velocity cut = sqrt(0.30) = 0.55."
+  },
+  "jump.coyoteMs": {
+    "label": "Coyote time", "unit": "ms",
+    "min": 0, "max": 300, "step": 10, "applyMode": "live",
+    "note": "GUESS. Raised from the plan's 100 because the design target is explicitly forgiving, not precision-demanding."
+  },
+  "jump.bufferMs": {
+    "label": "Jump buffer", "unit": "ms",
+    "min": 0, "max": 300, "step": 10, "applyMode": "live",
+    "note": "GUESS, same reasoning as coyote."
+  },
+  "run.maxSpeedTilesPerSec": {
+    "label": "Run speed", "unit": "tiles/sec",
+    "min": 2.0, "max": 20.0, "step": 0.25, "applyMode": "live",
+    "note": "GUESS - not measured. Genre convention plus the plan's original value. IF THE JUMP FEELS TOO VERTICAL, RAISE THIS rather than lowering jump height: height is measured, this is not. At 8.0 the full-airtime reach is 5.4 tiles against a 7.8 tile jump height."
+  },
+  "run.timeToMaxSpeedMs": {
+    "label": "Accel to full run", "unit": "ms",
+    "min": 20, "max": 600, "step": 10, "applyMode": "live",
+    "note": "GUESS. Slightly slower than the plan's 120 to suit a momentum-forward feel."
+  },
+  "run.timeToStopMs": {
+    "label": "Decel to stop", "unit": "ms",
+    "min": 20, "max": 600, "step": 10, "applyMode": "live",
+    "note": "GUESS."
+  },
+  "swing.dampingPerSecond": {
+    "label": "Swing damping", "unit": "per second",
+    "min": 0.10, "max": 1.00, "step": 0.01, "applyMode": "live",
+    "note": "PER SECOND, converted per-step at load. 0.74/sec = 0.995/step at 60Hz. Putting 0.995 in this key makes the vine near-frictionless and reads as weightless, not as a unit bug."
+  },
+  "swing.releaseBoostMultiplier": {
+    "label": "Swing release boost", "unit": "x tangential",
+    "min": 0.5, "max": 3.0, "step": 0.05, "applyMode": "live",
+    "note": "GUESS, but constrained: the manual frames vine release as the wide-pit crossing tool, so a swing must out-range a jump. At current values max release is 24 tiles/sec = 3x run speed. If chained swings do not clearly beat jumping, raise this."
+  },
+  "swing.grabRadiusTiles": {
+    "label": "Grab assist radius", "unit": "tiles",
+    "min": 0.5, "max": 4.0, "step": 0.1, "applyMode": "live",
+    "note": "GUESS. First thing to raise if vine chaining feels like work - never change the pendulum physics instead."
+  },
+  "swing.grabRadiusTouchMultiplier": {
+    "label": "Grab assist - touch bonus", "unit": "x",
+    "min": 1.0, "max": 3.0, "step": 0.1, "applyMode": "live",
+    "note": "Raise this on the phone, not the base radius, so desktop feel is not degraded to fix touch."
+  },
+  "camera.deadzoneHeightTiles": {
+    "label": "Camera deadzone height", "unit": "tiles",
+    "min": 1.0, "max": 10.0, "step": 0.5, "applyMode": "live",
+    "note": "GUESS, raised from the plan's 3.0. With a 7.8 tile jump a tight deadzone pans the camera on every hop. The original pans aggressively - 254px measured - which is exactly what made its footage hard to measure."
+  },
+  "world.fixedTimestepHz": {
+    "label": "Physics rate", "unit": "hz",
+    "min": 30, "max": 120, "step": 10, "applyMode": "reload"
+  },
+  "world.characterHeightTiles": {
+    "label": "Character height", "unit": "tiles",
+    "min": 1.0, "max": 4.0, "step": 0.1, "applyMode": "respawn",
+    "note": "THE LOAD-BEARING ASSUMPTION. Every measured value from the reference is in character-heights, so this number scales all of them. At 2.0 the jump is 7.8 tiles; at 1.5 it would be 5.9; at 2.5 it would be 9.8. Change this first if the whole game feels wrongly scaled, and re-derive rather than patching individual values."
+  }
+}
